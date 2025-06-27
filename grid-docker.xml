@@ -16,7 +16,7 @@
            <class name="testCases.TC_001_AccountRegistrationTest"/> 
      		<class name="testCases.TC_002_LoginTest"/> 
     </classes>
-  </test> 
+  </test>
 
  <test name="Linux-Firefox">
     <parameter name="os" value="Linux"/>

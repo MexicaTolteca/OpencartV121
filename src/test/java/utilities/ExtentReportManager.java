@@ -35,13 +35,12 @@ public class ExtentReportManager implements ITestListener {
 	String repName;
 
 	public void onStart(ITestContext testContext) {
-		
+
 		/*
-		SimpleDateFormat df=new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
-		Date dt=new Date();
-		String currentdatetimestamp=df.format(dt);
-		*/
-		
+		 * SimpleDateFormat df=new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss"); Date dt=new
+		 * Date(); String currentdatetimestamp=df.format(dt);
+		 */
+
 		String timeStamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());// time stamp
 		repName = "Test-Report-" + timeStamp + ".html";
 		sparkReporter = new ExtentSparkReporter(".\\reports\\" + repName);// specify location of the report
@@ -49,7 +48,7 @@ public class ExtentReportManager implements ITestListener {
 		sparkReporter.config().setDocumentTitle("opencart Automation Report"); // Title of report
 		sparkReporter.config().setReportName("opencart Functional Testing"); // name of the report
 		sparkReporter.config().setTheme(Theme.DARK);
-		
+
 		extent = new ExtentReports();
 		extent.attachReporter(sparkReporter);
 		extent.setSystemInfo("Application", "opencart");
@@ -57,39 +56,46 @@ public class ExtentReportManager implements ITestListener {
 		extent.setSystemInfo("Sub Module", "Customers");
 		extent.setSystemInfo("User Name", System.getProperty("user.name"));
 		extent.setSystemInfo("Environemnt", "QA");
-		
+
+		// "os", and "browser" we get these from master.xml when onStart is called
+		// "testContext" is of type ITestContext pass to this method
 		String os = testContext.getCurrentXmlTest().getParameter("os");
 		extent.setSystemInfo("Operating System", os);
-		
+
 		String browser = testContext.getCurrentXmlTest().getParameter("browser");
 		extent.setSystemInfo("Browser", browser);
-		
+
 		List<String> includedGroups = testContext.getCurrentXmlTest().getIncludedGroups();
-		if(!includedGroups.isEmpty()) {
-		extent.setSystemInfo("Groups", includedGroups.toString());
+		if (!includedGroups.isEmpty()) {
+			extent.setSystemInfo("Groups", includedGroups.toString());
 		}
 	}
 
 	public void onTestSuccess(ITestResult result) {
-	
+
 		test = extent.createTest(result.getTestClass().getName());
 		test.assignCategory(result.getMethod().getGroups()); // to display groups in report
-		test.log(Status.PASS,result.getName()+" got successfully executed");
-		
+		test.log(Status.PASS, result.getName() + " got successfully executed");
+
 	}
 
 	public void onTestFailure(ITestResult result) {
 		test = extent.createTest(result.getTestClass().getName());
 		test.assignCategory(result.getMethod().getGroups());
-		
-		test.log(Status.FAIL,result.getName()+" got failed");
+
+		test.log(Status.FAIL, result.getName() + " Test failed");
 		test.log(Status.INFO, result.getThrowable().getMessage());
-		
+
 		try {
+			// Creating a new object of BaseClass, but not storing it in a variable,
+			// From the object call captureScreen method and pass the name of the method
+			// Name of the method you get fromt the result that contains the failed method
+			// new would create another driver creating conflict; therefore, driver is static in BaseClass
 			String imgPath = new BaseClass().captureScreen(result.getName());
 			test.addScreenCaptureFromPath(imgPath);
-			
+
 		} catch (IOException e1) {
+			// if the screenshot is not available, "FileNotFound" exception we will get
 			e1.printStackTrace();
 		}
 	}
@@ -97,47 +103,46 @@ public class ExtentReportManager implements ITestListener {
 	public void onTestSkipped(ITestResult result) {
 		test = extent.createTest(result.getTestClass().getName());
 		test.assignCategory(result.getMethod().getGroups());
-		test.log(Status.SKIP, result.getName()+" got skipped");
+		test.log(Status.SKIP, result.getName() + " Test skipped");
 		test.log(Status.INFO, result.getThrowable().getMessage());
 	}
 
 	public void onFinish(ITestContext testContext) {
-		
+
 		extent.flush();
-		
-		String pathOfExtentReport = System.getProperty("user.dir")+"\\reports\\"+repName;
+
+		String pathOfExtentReport = System.getProperty("user.dir") + "\\reports\\" + repName;
 		File extentReport = new File(pathOfExtentReport);
-		
+
 		try {
 			Desktop.getDesktop().browse(extentReport.toURI());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		/*
-		try {
-			  URL url = new  URL("file:///"+System.getProperty("user.dir")+"\\reports\\"+repName);
-		  
-		  // Create the email message 
-		  ImageHtmlEmail email = new ImageHtmlEmail();
-		  email.setDataSourceResolver(new DataSourceUrlResolver(url));
-		  email.setHostName("smtp.googlemail.com"); 
-		  email.setSmtpPort(465);
-		  email.setAuthenticator(new DefaultAuthenticator("pavanoltraining@gmail.com","password")); 
-		  email.setSSLOnConnect(true);
-		  email.setFrom("pavanoltraining@gmail.com"); //Sender
-		  email.setSubject("Test Results");
-		  email.setMsg("Please find Attached Report....");
-		  email.addTo("pavankumar.busyqa@gmail.com"); //Receiver 
-		  email.attach(url, "extent report", "please check report..."); 
-		  email.send(); // send the email 
+		// This code is to automatically send the report via email
+//		 try { URL url = new URL("file:///"+System.getProperty("user.dir")+"\\reports\\"+repName);
+//		  
+//		 // Create the email message 
+//			 ImageHtmlEmail email = new ImageHtmlEmail();
+//			 email.setDataSourceResolver(new DataSourceUrlResolver(url));
+//			 email.setHostName("smtp.googlemail.com"); // This will work only for gmail server
+//			 email.setSmtpPort(465);
+//			 email.setAuthenticator(new DefaultAuthenticator("pavanoltraining@gmail.com","password"));
+//			 email.setSSLOnConnect(true); 
+//			 email.setFrom("pavanoltraining@gmail.com"); //Sender
+//			 email.setSubject("Test Results");
+//			 email.setMsg("Please find Attached Report....");
+//			 email.addTo("pavankumar.busyqa@gmail.com"); //Receiver 
+//			 email.attach(url, "extent report", "please check report..."); 
+//			 email.send(); // send the email 
+//		 }
+//		 catch(Exception e) 
+//		  	{ 
+//			 e.printStackTrace(); 
+//			}
+		 
 		  }
-		  catch(Exception e) 
-		  { 
-			  e.printStackTrace(); 
-			  }
-	   */
 		 
 	}
 
-}

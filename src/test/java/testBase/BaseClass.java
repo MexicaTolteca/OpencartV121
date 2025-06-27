@@ -32,21 +32,24 @@ public class BaseClass {
 
 	public static WebDriver driver;
 	public Logger logger;  //Log4j
-	public Properties p;  
+	public Properties p;   //variable used to read "config.properties" file
 	
 	@SuppressWarnings("deprecation")
 	@BeforeClass(groups= {"Sanity","Regression","Master"})
-	@Parameters({"os", "browser"})
+	@Parameters({"os", "browser"}) //Variables we get from master.xml 
 	public void setup(String os, String br) throws IOException
 	{
 		//Loading config.properties file
-		FileReader file=new FileReader("./src//tst//resoures//config.properties");
+		FileReader file=new FileReader("./src//tst//resoures//config.properties");  //typo  "tst" vs "test" in /src/test/resources
+		//FileReader file=new FileReader("./src//test//resoures//config.properties");
+
 		p=new Properties();
-		p.load(file);
+		p.load(file);  //Pass it a FileReader type to properties, "p"
 		
-		logger=LogManager.getLogger(this.getClass());
+		logger=LogManager.getLogger(this.getClass()); //"this", is whatever class called for example, TC_001_AccountRegistrationTest
 		
 		//REMOTE EXECUTION BEGIN
+		//p.getProterty...of 
 		if( (p.getProperty("execution_env").equalsIgnoreCase("local")) == false)
 		{
 			//execution_env=local from "config.properties" file
@@ -79,11 +82,11 @@ public class BaseClass {
 				case "firefox": capabilities.setBrowserName("firefox"); break;
 				default: System.out.println("No matching browser"); return;
 			}
-
+			//By running, java -jar selenium-server-4.31.0.jar standalone, the server is open at localhost.
 			driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"),capabilities);
 			
 		}
-		//REMOTE EXECUTION END
+		// REMOTE EXECUTION END Browser and OS picked 
 		
 		if(p.getProperty("execution_env").equalsIgnoreCase("local"))
 		{
@@ -95,13 +98,14 @@ public class BaseClass {
 			default : System.out.println("Invalid browser name..."); return;
 			}
 			
-		}
+		}// LOCAL EXECUTION Browser picked 
 		
 		driver.manage().deleteAllCookies();
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 		
+//	    URLs will be read from "config.properties" file vs hardcoding 
 //		driver.get("http://localhost/opencart/upload/index.php");
-//		driver.get("https://tutorialsninja.com/demo/"); //this URL will now be read from the properties file
+//		driver.get("https://tutorialsninja.com/demo/"); 
 		driver.get(p.getProperty("appURL2"));
 
 		driver.manage().window().maximize();
@@ -110,7 +114,8 @@ public class BaseClass {
 	@AfterClass(groups= {"Sanity","Regression","Master"})
 	public void tearDown()
 	{
-		driver.close();
+		//driver.close();
+		driver.quit();
 	}
 	
 	//@Test

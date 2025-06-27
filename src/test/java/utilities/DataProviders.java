@@ -16,7 +16,7 @@ public class DataProviders {
 		ExcelUtility xlutil=new ExcelUtility(path);//creating an object for XLUtility
 		
 		int totalrows=xlutil.getRowCount("Sheet1");	
-		int totalcols=xlutil.getCellCount("Sheet1",1);
+		int totalcols=xlutil.getCellCount("Sheet1",1);  //Name is Sheet1 and 1 is row number
 				
 		String logindata[][]=new String[totalrows][totalcols];//created for two dimension array which can store the data user and password
 		

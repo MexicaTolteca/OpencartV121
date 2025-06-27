@@ -5,12 +5,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 public class AccountRegistrationPage extends BasePage{
-	
+	//The test will initialize the driver and pass it to this page object
 	public AccountRegistrationPage(WebDriver driver)
 	{
 		super(driver);
 	}
-	
 
 @FindBy(xpath="//input[@id='input-firstname']") 
 WebElement txtFirstname;
@@ -39,12 +38,12 @@ WebElement btnContinue;
 @FindBy(xpath = "//h1[normalize-space()='Your Account Has Been Created!']")
 WebElement msgConfirmation;
 
-
+//fname from the TestCase
 public void setFirstName(String fname) {
 	txtFirstname.sendKeys(fname);
 
 }
-
+//fname from the lname etc for the rest
 public void setLastName(String lname) {
 	txtLasttname.sendKeys(lname);
 
@@ -98,7 +97,7 @@ public void clickContinue() {
 	//mywait.until(ExpectedConditions.elementToBeClickable(btnContinue)).click();
 	
 }
-
+//Validations should be done in the test not the Page Object
 public String getConfirmationMsg() {
 	try {
 		return (msgConfirmation.getText());
